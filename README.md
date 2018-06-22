@@ -9,4 +9,6 @@
 
 1. 安装命令: `docker exec -it laradock_workspace_1 php /home/php-script/install.php`
 2. 根据提示输入对应的信息.
+3. HOSTS文件 `127.0.0.1  aimeos.test`
 
+开始探索吧! 
