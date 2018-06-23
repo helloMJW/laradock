@@ -3,6 +3,6 @@
 $servername = "mysql";
 $username = "root";
 $password = "root";
-$dbname = 'thinksns';
+$dbname = 'flarum';
 
-$projectUrl = '/var/www/thinksns-plus';
+$projectUrl = '/var/www/flarum';

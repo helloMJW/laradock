@@ -1,15 +1,7 @@
 <?php
-$servername = "mysql";
-$username = "root";
-$password = "root";
-$dbname = 'thinksns';
-
-$projectUrl = '/var/www/thinksns-plus';
-
+include("/home/php-script/env.php");
 // 下载项目
-passthru("composer create-project zhiyicx/thinksns-plus {$projectUrl}" );
-passthru("php {$projectUrl}/artisan vendor:publish --all");
-passthru("chmod -R 777 {$projectUrl}/storage");
+passthru("composer create-project flarum/flarum {$projectUrl} --stability=beta" );
 
 // 创建连接
 $conn = new mysqli($servername, $username, $password);
@@ -32,7 +24,6 @@ if(!checkDb($conn, $dbname)) {
 }
 
 $conn->close();
-
 
 
 //检查数据库存在
