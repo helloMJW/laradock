@@ -1,7 +1,8 @@
 .idea
 /logs
 /data
-.env
 /.project
 .docker-sync
 /jenkins/jenkins_home
+.DS_Store
+nginx/.DS_Store
