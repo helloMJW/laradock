@@ -279,7 +279,15 @@ RUN if [ ${INSTALL_SWOOLE} = true ]; then \
       if [ $(php -r "echo PHP_MINOR_VERSION;") = "0" ]; then \
         pecl install swoole-2.2.0; \
       else \
-        pecl install swoole; \
+        curl -o /tmp/swoole.tar.gz https://github.com/swoole/swoole-src/archive/v4.4.12.tar.gz -L && \
+        tar zxvf /tmp/swoole.tar.gz && cd swoole-src* && \
+        phpize && \
+        ./configure \
+        --enable-openssl  \
+        --enable-http2  \
+        --enable-async-redis \
+        --enable-mysqlnd && \
+        make && make install; \
       fi \
     fi && \
     docker-php-ext-enable swoole \
