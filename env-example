@@ -900,3 +900,21 @@ GEARMAN_MYSQL_TABLE=gearman_queue
 
 ### ELK Stack ##################################################
 ELK_VERSION=7.5.1
+
+### 代理 ###########
+HTTP_PROXY=
+HTTPS_PROXY=
+NO_PROXY=
+
+### VSFTP ######################################
+VSFTPD_USER_CONFIG_PATH=./vsftpd/vsftpd_user_conf
+VSFTPD_USER_TXT=./vsftpd/user/virtual_users.txt
+VSFTPD_USER_DB=./vsftpd/user/virtual_users.db
+VSFTPD_CONFIG_FILE=./vsftpd/vsftpd.conf
+FTP_USER=h5
+FTP_PASS=B5txCSVeYgQTsHC
+VSFTPD_PORT1=20
+VSFTPD_PORT2=21
+VSFTPD_PASSIVITY=21100-21110
+VSFTPD_HOME_PATH=/home/vsftpd
+VSFTPD_LOG_PATH=./logs/vsftpd

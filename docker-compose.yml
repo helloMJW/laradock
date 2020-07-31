@@ -149,9 +149,9 @@ services:
           - INSTALL_FFMPEG=${WORKSPACE_INSTALL_FFMPEG}
           - INSTALL_WKHTMLTOPDF=${WORKSPACE_INSTALL_WKHTMLTOPDF}
           - INSTALL_GNU_PARALLEL=${WORKSPACE_INSTALL_GNU_PARALLEL}
-          - http_proxy
-          - https_proxy
-          - no_proxy
+          - http_proxy=${HTTP_PROXY}
+          - https_proxy=${HTTPS_PROXY}
+          - no_proxy=${NO_PROXY}
       volumes:
         - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
         - docker-in-docker:/certs/client
@@ -244,9 +244,9 @@ services:
           - PUID=${PHP_FPM_PUID}
           - PGID=${PHP_FPM_PGID}
           - LOCALE=${PHP_FPM_DEFAULT_LOCALE}
-          - http_proxy
-          - https_proxy
-          - no_proxy
+          - http_proxy=${HTTP_PROXY}
+          - https_proxy=${HTTPS_PROXY}
+          - no_proxy=${NO_PROXY}
       volumes:
         - ./php-fpm/php${PHP_VERSION}.ini:/usr/local/etc/php/php.ini
         - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
@@ -350,9 +350,9 @@ services:
           - CHANGE_SOURCE=${CHANGE_SOURCE}
           - PHP_UPSTREAM_CONTAINER=${NGINX_PHP_UPSTREAM_CONTAINER}
           - PHP_UPSTREAM_PORT=${NGINX_PHP_UPSTREAM_PORT}
-          - http_proxy
-          - https_proxy
-          - no_proxy
+          - http_proxy=${HTTP_PROXY}
+          - https_proxy=${HTTPS_PROXY}
+          - no_proxy=${NO_PROXY}
       volumes:
         - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
         - ${NGINX_HOST_LOG_PATH}:/var/log/nginx
@@ -487,9 +487,9 @@ services:
       build:
         context: ./mariadb
         args:
-          - http_proxy
-          - https_proxy
-          - no_proxy
+          - http_proxy=${HTTP_PROXY}
+          - https_proxy=${HTTPS_PROXY}
+          - no_proxy=${NO_PROXY}
           - MARIADB_VERSION=${MARIADB_VERSION}
       volumes:
         - ${DATA_PATH_HOST}/mariadb:/var/lib/mysql
@@ -1761,4 +1761,91 @@ services:
         - ${DATA_PATH_HOST}/tomcat/webapps:/usr/local/tomcat/webapps
         - ${DATA_PATH_HOST}/tomcat/logs:/usr/local/tomcat/logs
       # restart: always
+
+### vsftpd ###########################################
+    vsftpd:
+      build:
+        context: ./vsftpd
+      environment:
+        - FTP_USER=${FTP_USER}
+        - FTP_PASS=${FTP_PASS}
+        - LOCAL_UMASK=022
+      volumes:
+        #- ${VSFTPD_USER_TXT}:/etc/vsftpd/virtual_users.txt
+        #- ${VSFTPD_USER_DB}:/etc/vsftpd/virtual_users.db
+        #- ${VSFTPD_CONFIG_FILE}:/etc/vsftpd/vsftpd.conf
+        - ${VSFTPD_HOME_PATH}:/home/vsftpd
+        #- /home/vsftpd/ftp:/home/vsftpd/ftp
+        #- /websys/test:/home/vsftpd/h5
+        - ${VSFTPD_LOG_PATH}:/var/log/vsftpd
+      ports:
+        - "${VSFTPD_PORT1}:20"
+        - "${VSFTPD_PORT2}:21"
+        - "${VSFTPD_PASSIVITY}:21100-21110"        
+      networks:
+        - backend
+      restart: always
+    kafka:
+      image: wurstmeister/kafka       
+      volumes: 
+        - /etc/localtime:/etc/localtime 
+      depends_on:
+        - zookeeper
+      ports:
+        - "9092:9092"
+      environment:
+        KAFKA_ADVERTISED_HOST_NAME: 192.168.3.67  
+        KAFKA_ZOOKEEPER_CONNECT: 192.168.3.67:2181       
+        KAFKA_LISTENERS: "PLAINTEXT://:9092"
+        KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://192.168.3.67:9092"
+    kafka1:
+      image: wurstmeister/kafka       
+      volumes: 
+        - /etc/localtime:/etc/localtime 
+      depends_on:
+        - zookeeper
+      ports:
+        - "9093:9093"
+      environment:
+        KAFKA_ADVERTISED_HOST_NAME: 192.168.3.67  
+        KAFKA_ZOOKEEPER_CONNECT: 192.168.3.67:2181       
+        KAFKA_LISTENERS: "PLAINTEXT://:9093"
+        KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://192.168.3.67:9093"
+    kafka-manager:
+      image: sheepkiller/kafka-manager     
+      environment:
+        ZK_HOSTS: 192.168.3.67:2181
+        KAFKA_BROKERS: 192.168.3.67:9092,192.168.3.67:9093
+      depends_on:
+        - zookeeper
+        - kafka
+        - kafka1          
+      ports:  
+        - "9000:9000"
+    nsqlookupd:
+      image: nsqio/nsq
+      command: /nsqlookupd
+      hostname: nsqlookupd
+      ports:
+        - "4161:4161"
+        - "4160:4160"
+    nsqd:
+      image: nsqio/nsq
+      command: /nsqd --lookupd-tcp-address=nsqlookupd:4160 -broadcast-address=192.168.3.67
+      volumes:
+        - /data/nsq:/data
+      depends_on:
+        - nsqlookupd
+      hostname: nsqd
+      ports:
+        - "4151:4151"
+        - "4150:4150"
+    nsqadmin:
+      image: nsqio/nsq
+      command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+      depends_on:
+        - nsqlookupd
+      hostname: nsqadmin
+      ports:
+        - "4171:4171"
 
