@@ -58,6 +58,7 @@ services:
 
 ### Workspace Utilities ##################################
     workspace:
+      image: registry.cn-shenzhen.aliyuncs.com/webdock/workspace:1.0
       build:
         context: ./workspace
         args:
@@ -180,6 +181,7 @@ services:
 
 ### PHP-FPM ##############################################
     php-fpm:
+      image: registry.cn-shenzhen.aliyuncs.com/webdock/php-fpm:1.0
       build:
         context: ./php-fpm
         args:
@@ -344,6 +346,7 @@ services:
 
 ### NGINX Server #########################################
     nginx:
+      image: registry.cn-shenzhen.aliyuncs.com/webdock/nginx:1.15-1.0
       build:
         context: ./nginx
         args:
@@ -431,6 +434,7 @@ services:
 
 ### MySQL ################################################
     mysql:
+      image: registry.cn-shenzhen.aliyuncs.com/webdock/mysql:5.7-1.0
       build:
         context: ./mysql
         args:
@@ -589,6 +593,7 @@ services:
 
 ### Redis ################################################
     redis:
+      image: registry.cn-shenzhen.aliyuncs.com/webdock/redis:1.0
       build: ./redis
       volumes:
         - ${DATA_PATH_HOST}/redis:/data
